@@ -23,6 +23,7 @@ namespace BattleCity.Stats
 
         public override void Initialize()
         {
+            base.Initialize();
             LiteAnimationCollection animationCollection = LiteAnimationCollection.CurrentInstance;
 
             if (animationCollection != null)
@@ -35,6 +36,10 @@ namespace BattleCity.Stats
 
         public void SetKnockDown(float time)
         {
+            if (_underProtection)
+            {
+                return;
+            }
             StartCoroutine(KnockOutCoroutine(time));
         }
 
@@ -50,6 +55,11 @@ namespace BattleCity.Stats
                 return;
             }
             base.SetDamage(damage);
+        }
+
+        protected override void PlayDestroySound()
+        {
+            AudioSource.PlayClipAtPoint(SoundCollection.GetSound(SoundTypes.PlayerTankExplosion), transform.position);
         }
 
         private IEnumerator ProtectionCoroutine()

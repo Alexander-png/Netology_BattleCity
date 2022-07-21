@@ -18,7 +18,6 @@ namespace BattleCity.Movement.Input
         {
             Vector2 newInput = input.Get<Vector2>();
             
-
             _movement.InputAxis = newInput;
         }
 

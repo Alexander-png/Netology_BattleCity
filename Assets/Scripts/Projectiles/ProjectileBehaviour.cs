@@ -36,9 +36,23 @@ namespace BattleCity.Projectiles
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
+            SoundCollection sounds = SoundCollection.CurrentInstance;
+            bool isSentByMob = Side != SideType.Players;
+
             if (collision.gameObject.TryGetComponent(out MapElement element))
             {
                 element.OnProjectileCollision(this);
+                if (!isSentByMob)
+                {
+                    if (element.Destoryable)
+                    {
+                        AudioSource.PlayClipAtPoint(sounds.GetSound(SoundTypes.ProjectileExplosion), transform.position);
+                    }
+                    else
+                    {
+                        AudioSource.PlayClipAtPoint(sounds.GetSound(SoundTypes.SteelHit), transform.position);
+                    }
+                }
             }
             else if (collision.gameObject.TryGetComponent(out EnemyStats enemy))
             {
@@ -64,7 +78,16 @@ namespace BattleCity.Projectiles
             }
 
             LiteAnimationCollection.CurrentInstance.PlayAnimation(transform.position, LiteAnimationTypes.ProjectileExplosion);
+            if (!isSentByMob)
+            {
+                PlayExplosionSound();
+            }
             Destroy(gameObject);
+        }
+
+        private void PlayExplosionSound()
+        {
+            AudioSource.PlayClipAtPoint(SoundCollection.CurrentInstance.GetSound(SoundTypes.ProjectileExplosion), transform.position);
         }
     }
 }

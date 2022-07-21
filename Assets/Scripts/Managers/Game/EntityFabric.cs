@@ -5,6 +5,7 @@ using BattleCity.Spawners;
 using BattleCity.Stats;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BattleCity.Managers.Game
@@ -36,6 +37,7 @@ namespace BattleCity.Managers.Game
 
         private PlayerStats _currentPlayer1Object;
         private PlayerStats _currentPlayer2Object;
+        private List<BaseStats> _currentBaseObjects;
 
         private byte _enemiesLeft;
         private byte _maxAliveEnemies;
@@ -45,25 +47,48 @@ namespace BattleCity.Managers.Game
 
         public event EnemySpawnEvents OnEnemiesLeft;
         public event EntityEvents OnPlayerDestroyed;
-        public event EntityEvents OnEnemyDestoyed;
-        public event EntityEvents OnBaseDestoyed;
+        public event EntityEvents OnEnemyDestroyed;
+        public event EntityEvents OnBaseDestroyed;
 
         private void OnDisable()
         {
             _player1.OnDestroyed -= OnPlayerDestroyedInternal;
             _player2.OnDestroyed -= OnPlayerDestroyedInternal;
+            foreach (BaseStats baseItem in _currentBaseObjects)
+            {
+                baseItem.OnDestroyed -= OnBaseDestroyedInternal;
+            }
+            _currentBaseObjects.Clear();
+
             OnEnemiesLeft = null;
             OnPlayerDestroyed = null;
-            OnEnemyDestoyed = null;
-            OnBaseDestoyed = null;
+            OnEnemyDestroyed = null;
+            OnBaseDestroyed = null;
         }
 
         public void OnPreInitialize()
         {
+            _currentBaseObjects = new List<BaseStats>();
             if (GameStaticVariables.GameMode != SelectedGameMode.None)
             {
                 _currentGameMode = GameStaticVariables.GameMode;
             }
+        }
+
+        public void ResetEntities()
+        {
+            _currentPlayer1Object.OnDestroyed -= OnPlayerDestroyedInternal;
+            _currentPlayer2Object.OnDestroyed -= OnPlayerDestroyedInternal;
+
+            foreach (BaseStats baseItem in _currentBaseObjects)
+            {
+                baseItem.OnDestroyed -= OnBaseDestroyedInternal;
+                Destroy(baseItem.gameObject);
+            }
+            _currentBaseObjects.Clear();
+
+            Destroy(_currentPlayer1Object.gameObject);
+            Destroy(_currentPlayer2Object.gameObject);
         }
 
         public void OnStageStart(BaseMapManager map)
@@ -148,6 +173,7 @@ namespace BattleCity.Managers.Game
             }
             else if (entity is EnemyStats enemy)
             {
+                enemy.Initialize();
                 enemy.OnDestroyed += OnEnemyDestroy;
                 if (Array.IndexOf(_enemiesWithBonus, _spawnedEnemyCount) != -1)
                 {
@@ -159,7 +185,8 @@ namespace BattleCity.Managers.Game
             }
             else if (entity is BaseStats newBase)
             {
-                newBase.OnDestroyed += OnBaseDestroyed;
+                newBase.OnDestroyed += OnBaseDestroyedInternal;
+                _currentBaseObjects.Add(newBase);
             }
         }
 
@@ -193,7 +220,7 @@ namespace BattleCity.Managers.Game
         {
             sender.OnDestroyed -= OnEnemyDestroy;
             _currentAliveEnemies--;
-            OnEnemyDestoyed?.Invoke(sender);
+            OnEnemyDestroyed?.Invoke(sender);
         }
 
         private void OnPlayerDestroyedInternal(EntityStats sender)
@@ -202,10 +229,11 @@ namespace BattleCity.Managers.Game
             OnPlayerDestroyed?.Invoke(sender);
         }
 
-        private void OnBaseDestroyed(EntityStats sender)
+        private void OnBaseDestroyedInternal(EntityStats sender)
         {
-            sender.OnDestroyed -= OnBaseDestroyed;
-            OnBaseDestoyed?.Invoke(sender);
+            sender.OnDestroyed -= OnBaseDestroyedInternal;
+            _currentBaseObjects.Remove(sender as BaseStats);
+            OnBaseDestroyed?.Invoke(sender);
         }
 
         public delegate void EnemySpawnEvents();

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace BattleCity.Scriptable
 {
-    public class AudioItem : ScriptableObject
+    public class AudioItem : MonoBehaviour
     {
         [System.Serializable]
         public class SpellAnimationEntry

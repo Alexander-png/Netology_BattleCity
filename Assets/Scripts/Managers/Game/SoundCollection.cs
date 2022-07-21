@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using static BattleCity.Scriptable.AudioItem;
 
@@ -24,19 +25,21 @@ namespace BattleCity.Managers.Game
         LevanPolka = 16,
     }
 
-    public class SoundManager : MonoBehaviour
+    public class SoundCollection : MonoBehaviour
     {
-        [SerializeField]
-        private AudioSource _source;
-
         [SerializeField, Space(15)]
         private SpellAnimationEntry[] _sounds;
 
-        public static SoundManager CurrentInstance { get; private set; }
+        public static SoundCollection CurrentInstance { get; private set; }
 
-        public void PlaySound(SoundTypes sound)
+        private void Awake()
         {
-            
+            CurrentInstance = this;
+        }
+
+        public AudioClip GetSound(SoundTypes soundType)
+        {
+            return Array.Find(_sounds, s => s.AudioType == soundType).AudioClip;
         }
     }
 }

@@ -16,6 +16,8 @@ namespace BattleCity.Stats
         [SerializeField]
         private SideType _side;
 
+        private SoundCollection _soundCollection;
+
         public int Health
         {
             get
@@ -30,7 +32,11 @@ namespace BattleCity.Stats
 
         public SideType Side => _side;
 
+        public bool IsPlayer => _side == SideType.Players;
+
         public event EntityStatsEvents OnDestroyed;
+
+        protected SoundCollection SoundCollection => _soundCollection;
 
         protected void InvokeOnDestroyed()
         {
@@ -55,14 +61,14 @@ namespace BattleCity.Stats
             }
         }
 
-        protected void PlayDestroySound()
+        protected virtual void PlayDestroySound()
         {
-            // todo: add type of sounds
+            
         }
 
         public virtual void Initialize()
         {
-
+            _soundCollection = SoundCollection.CurrentInstance;
         }
 
         protected void InstatiateExplosion()

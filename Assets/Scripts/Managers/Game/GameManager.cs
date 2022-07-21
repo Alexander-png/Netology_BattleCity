@@ -1,6 +1,7 @@
 using BattleCity.Managers.Map;
 using BattleCity.Stats;
 using System;
+using UnityEditor;
 using UnityEngine;
 
 namespace BattleCity.Managers.Game
@@ -28,7 +29,7 @@ namespace BattleCity.Managers.Game
         {
             _entityFabric.OnPreInitialize();
             _entityFabric.OnPlayerDestroyed += OnPlayerDestroyed;
-            _entityFabric.OnEnemyDestoyed += OnEnemyDestoyed;
+            _entityFabric.OnEnemyDestroyed += OnEnemyDestoyed;
             _entityFabric.OnEnemiesLeft += OnEnemiesLeft;
             if (_currentLevelIndex == -1)
             {
@@ -39,7 +40,7 @@ namespace BattleCity.Managers.Game
         private void OnDisable()
         {
             _entityFabric.OnPlayerDestroyed -= OnPlayerDestroyed;
-            _entityFabric.OnEnemyDestoyed -= OnEnemyDestoyed;
+            _entityFabric.OnEnemyDestroyed -= OnEnemyDestoyed;
             _entityFabric.OnEnemiesLeft -= OnEnemiesLeft;
         }
 
@@ -58,6 +59,7 @@ namespace BattleCity.Managers.Game
 
         private void LoadNextLevel()
         {
+            _entityFabric.ResetEntities();
             _currentLevelIndex++;
             if (_currentLevelIndex >= _levels.Length)
             {
@@ -94,7 +96,7 @@ namespace BattleCity.Managers.Game
 
         private void OnEnemiesLeft()
         {
-            Destroy(_instatiatedLevel);
+            Destroy(_instatiatedLevel.gameObject);
             _instatiatedLevel = null;
             LoadNextLevel();
         }
