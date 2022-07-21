@@ -200,7 +200,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 4.46, z: -10}
+  m_LocalPosition: {x: 0, y: 4.46, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -275,7 +275,8 @@ MonoBehaviour:
   _levels:
   - {fileID: 8516167389180272311, guid: b49618f301693544ea87631c3132f02d, type: 3}
   - {fileID: 8516167389180272311, guid: a2724bb062b62ed4e804783fbe94d59d, type: 3}
-  _startLevelIndex: 0
+  - {fileID: 8060723546350120174, guid: a11415e3c04d27048abb53aee1f8967d, type: 3}
+  _startLevelIndex: 2
   _entityFabric: {fileID: 1144415803}
   _livesLeft_1Player: 2
   _livesLeft_2Player: 2

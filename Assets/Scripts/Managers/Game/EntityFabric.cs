@@ -49,6 +49,7 @@ namespace BattleCity.Managers.Game
         public event EntityEvents OnPlayerDestroyed;
         public event EntityEvents OnEnemyDestroyed;
         public event EntityEvents OnBaseDestroyed;
+        public event EntityPreSpawnEvents PlayerPreSpawn;
 
         private void OnDisable()
         {
@@ -64,6 +65,7 @@ namespace BattleCity.Managers.Game
             OnPlayerDestroyed = null;
             OnEnemyDestroyed = null;
             OnBaseDestroyed = null;
+            PlayerPreSpawn = null;
         }
 
         public void OnPreInitialize()
@@ -77,8 +79,16 @@ namespace BattleCity.Managers.Game
 
         public void ResetEntities()
         {
-            _currentPlayer1Object.OnDestroyed -= OnPlayerDestroyedInternal;
-            _currentPlayer2Object.OnDestroyed -= OnPlayerDestroyedInternal;
+            if (_currentPlayer1Object != null)
+            {
+                _currentPlayer1Object.OnDestroyed -= OnPlayerDestroyedInternal;
+                Destroy(_currentPlayer1Object.gameObject);
+            }
+            if (_currentPlayer2Object != null)
+            {
+                _currentPlayer2Object.OnDestroyed -= OnPlayerDestroyedInternal;
+                Destroy(_currentPlayer2Object.gameObject);
+            }
 
             foreach (BaseStats baseItem in _currentBaseObjects)
             {
@@ -86,16 +96,14 @@ namespace BattleCity.Managers.Game
                 Destroy(baseItem.gameObject);
             }
             _currentBaseObjects.Clear();
-
-            Destroy(_currentPlayer1Object.gameObject);
-            Destroy(_currentPlayer2Object.gameObject);
         }
 
         public void OnStageStart(BaseMapManager map)
         {
+            map.Initialize(this);
+
             _enemySpawnPoints = map.EnemySpawnPoints;
             _playerSpawnPoints = map.PlayerSpawnPoints;
-
             _enemiesLeft = map.EnemiesOnLevel;
 
             switch (_currentGameMode)
@@ -149,21 +157,26 @@ namespace BattleCity.Managers.Game
         private void SpawnEntity(EntityStats entity, Vector2 position, bool doAnimation = true)
         {
             EntityEgg egg = Instantiate(_entityEgg, position, new Quaternion());
-            egg.PerformSpawn(this, entity, doAnimation);
+            egg.Initialize(entity);
+            if (entity is PlayerStats)
+            {
+                PlayerPreSpawn?.Invoke(egg);
+            }
+            egg.PerformSpawn(this, doAnimation);
         }
 
         public void OnEntitySpawned(EntityStats entity)
         {
             if (entity is PlayerStats player)
             {
-                if (entity.gameObject.name.Contains("Player1"))
+                if (player.gameObject.name.Contains("Player1"))
                 {
                     _currentPlayer1Object = player;
                     _currentPlayer1Object.Initialize();
                     _currentPlayer1Object.EnableProtectionAfterSpawn();
                     _currentPlayer1Object.OnDestroyed += OnPlayerDestroyedInternal;
                 }
-                else if (entity.gameObject.name.Contains("Player2"))
+                else if (player.gameObject.name.Contains("Player2"))
                 {
                     _currentPlayer2Object = player;
                     _currentPlayer2Object.Initialize();
@@ -238,5 +251,6 @@ namespace BattleCity.Managers.Game
 
         public delegate void EnemySpawnEvents();
         public delegate void EntityEvents(EntityStats stats);
+        public delegate void EntityPreSpawnEvents(EntityEgg egg);
     }
 }

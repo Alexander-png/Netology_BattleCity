@@ -54,7 +54,7 @@ namespace BattleCity.Managers.Game
             _currentLevelIndex = Array.IndexOf(_levels, levelToLoad);
             _instatiatedLevel = Instantiate(levelToLoad, _levelContainer);
             _instatiatedLevel.gameObject.SetActive(true);
-            _entityFabric.OnStageStart(levelToLoad);
+            _entityFabric.OnStageStart(_instatiatedLevel);
         }
 
         private void LoadNextLevel()

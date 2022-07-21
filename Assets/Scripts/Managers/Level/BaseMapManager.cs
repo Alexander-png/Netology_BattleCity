@@ -1,3 +1,4 @@
+using BattleCity.Managers.Game;
 using System;
 using UnityEngine;
 
@@ -52,12 +53,17 @@ namespace BattleCity.Managers.Map
             }
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
             for (int i = 0; i < transform.childCount; i++)
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
+        }
+
+        public virtual void Initialize(EntityFabric fabric)
+        {
+            
         }
     }
 }

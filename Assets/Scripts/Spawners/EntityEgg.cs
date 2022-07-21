@@ -11,18 +11,35 @@ namespace BattleCity.Spawners
         private EntityFabric _entityFabric;
         private LiteAnimation _spawnAnimation;
 
-        public void PerformSpawn(EntityFabric fabric, EntityStats entity, bool doAnimation = true)
-        {
-            _entityFabric = fabric;
-            _entityToSpawn = entity;
+        public EntityStats ContainingEntity => _entityToSpawn;
 
+        public event SpawnerEggEvents OnEntitySpawned;
+
+        private void OnDisable()
+        {
+            OnEntitySpawned = null;
+        }
+
+        public void Initialize(EntityStats entity)
+        {
+            _entityToSpawn = entity;
             LiteAnimationCollection animationCollection = LiteAnimationCollection.CurrentInstance;
-            if (animationCollection != null && doAnimation)
+            if (animationCollection != null)
             {
                 LiteAnimation shieldAnimation = animationCollection.GetAnimation(LiteAnimationTypes.TankSpawn);
                 _spawnAnimation = Instantiate(shieldAnimation, transform);
-                _spawnAnimation.SetVisible(true);
+                _spawnAnimation.SetVisible(false);
                 _spawnAnimation.AnimationEnded += OnSpawnAnimationEnded;
+            }
+        }
+
+        public void PerformSpawn(EntityFabric fabric, bool doAnimation = true)
+        {
+            _entityFabric = fabric;
+
+            if (_spawnAnimation != null && doAnimation)
+            {
+                _spawnAnimation.SetVisible(true);
             }
             else
             {
@@ -39,7 +56,10 @@ namespace BattleCity.Spawners
         {
             EntityStats spawnedEntity = Instantiate(_entityToSpawn, transform.position, new Quaternion());
             _entityFabric.OnEntitySpawned(spawnedEntity);
-            Destroy(this);
+            OnEntitySpawned?.Invoke(spawnedEntity);
+            Destroy(gameObject);
         }
+
+        public delegate void SpawnerEggEvents(EntityStats entity);
     }
 }

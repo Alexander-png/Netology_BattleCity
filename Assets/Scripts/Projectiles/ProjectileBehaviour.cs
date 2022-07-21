@@ -15,6 +15,8 @@ namespace BattleCity.Projectiles
         [SerializeField]
         private int _knockDownTime = 3;
 
+        public string SenderName { get; set; }
+
         public SideType Side { get; set; }
 
         private void Start()
@@ -26,7 +28,7 @@ namespace BattleCity.Projectiles
         {
             base.SetMoveDirection(newDirection);
             _body.velocity = MovementConstraints.GetVectorMovement(newDirection) * _speed;
-            _body.rotation = MovementConstraints.GetDirection(newDirection);
+            _body.rotation = MovementConstraints.GetRotationAngle(newDirection);
         }
 
         protected override void MovementLogic()
@@ -34,8 +36,13 @@ namespace BattleCity.Projectiles
             // empty
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (collision.gameObject.name.Contains(SenderName))
+            {
+                return;
+            }
+
             SoundCollection sounds = SoundCollection.CurrentInstance;
             bool isSentByMob = Side != SideType.Players;
 

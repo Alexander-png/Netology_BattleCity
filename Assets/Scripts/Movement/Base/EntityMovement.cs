@@ -40,7 +40,7 @@ namespace BattleCity.Movement.Base
             { Direction.Right, 270 },
         };
 
-        public static float GetDirection(Direction direction) => _rotations[direction];
+        public static float GetRotationAngle(Direction direction) => _rotations[direction];
         public static Direction GetDirectionFromRotation(float rotation) => _rotations.First(r => r.Value == rotation).Key;
         public static Vector2 GetVectorMovement(Direction direction) => _movements[direction];
     }
@@ -56,7 +56,7 @@ namespace BattleCity.Movement.Base
 
         protected Direction _direction = Direction.Up;
 
-        public bool InputEnabled { get; set; } = true;
+        public bool InputEnabledMaster { get; set; } = true;
 
         public Rigidbody2D Body => _body;
 
@@ -97,7 +97,7 @@ namespace BattleCity.Movement.Base
                     _direction = Direction.Down;
                     break;
             }
-            _body.rotation = MovementConstraints.GetDirection(_direction);
+            _body.rotation = MovementConstraints.GetRotationAngle(_direction);
         }
     }
 }
@@ -108,4 +108,3 @@ namespace BattleCity.Movement.Base
 // UI (lives, score, etc)
 // bonuses
 // improve handling
-// tricks from binary city

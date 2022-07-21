@@ -34,6 +34,7 @@ namespace BattleCity.Shooting
             {
                 _canShoot = false;
                 ProjectileBehaviour bullet = Instantiate(_projectile.gameObject, _projectileSpawn.position, Quaternion.identity).GetComponent<ProjectileBehaviour>();
+                bullet.SenderName = gameObject.name;
                 bullet.SetMoveDirection(dir);
                 bullet.Side = _tankStats.Side;
                 PlayShootSound();

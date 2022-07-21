@@ -21,6 +21,8 @@ namespace BattleCity.Stats
         private bool _underProtection;
         private LiteAnimation _shieldAnimation;
 
+        public TankMovement Movement => _movement;
+
         public override void Initialize()
         {
             base.Initialize();
@@ -73,17 +75,17 @@ namespace BattleCity.Stats
 
         private IEnumerator KnockOutCoroutine(float time)
         {
-            _movement.InputEnabled = false;
+            _movement.InputEnabledMaster = false;
             _shootController.InputEnabled = false;
             StartCoroutine(BlinkAnimation());
             yield return new WaitForSeconds(time);
-            _movement.InputEnabled = true;
+            _movement.InputEnabledMaster = true;
             _shootController.InputEnabled = true;
         }
 
         private IEnumerator BlinkAnimation()
         {
-            while (!_movement.InputEnabled)
+            while (!_movement.InputEnabledMaster)
             {
                 _sprite.enabled = !_sprite.enabled;
                 yield return new WaitForSeconds(0.2f);
