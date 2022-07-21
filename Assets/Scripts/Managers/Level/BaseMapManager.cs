@@ -6,7 +6,9 @@ namespace BattleCity.Managers.Map
 {
     public abstract class BaseMapManager : MonoBehaviour
     {
-        [SerializeField, Min(0)]
+        [SerializeField]
+        private AudioSource _audioSource;
+        [SerializeField, Min(0), Space(15)]
         private byte _maxEnemiesOnMapOnePlayer = 4;
         [SerializeField, Min(0)]
         private byte _maxEnemiesOnMapTwoPlayer = 6;
@@ -20,11 +22,17 @@ namespace BattleCity.Managers.Map
         private Transform[] _playerSpawnPoints;
         [SerializeField]
         private Transform[] _basePlaces;
+        [SerializeField]
+        private int _baseHealth = 1;
+
+        protected AudioSource AudioSource => _audioSource;
 
         public byte MaxEnemiesOnMapOnePlayer => _maxEnemiesOnMapOnePlayer;
         public byte MaxEnemiesOnMapTwoPlayer => _maxEnemiesOnMapTwoPlayer;
         public byte EnemiesOnLevel => _enemiesOnLevel;
         public string BonusEnemies => _bonusEnemies;
+        public int BaseHealth => _baseHealth;
+
         public Transform[] EnemySpawnPoints
         { 
             get 
@@ -51,6 +59,12 @@ namespace BattleCity.Managers.Map
                 Array.Copy(_basePlaces, toReturn, _basePlaces.Length);
                 return toReturn;
             }
+        }
+
+        protected virtual void Start()
+        {
+            AudioSource.clip = SoundCollection.CurrentInstance.GetSound(SoundTypes.LevelStart);
+            AudioSource.Play();
         }
 
         protected virtual void OnDisable()

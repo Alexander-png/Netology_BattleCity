@@ -11,8 +11,6 @@ namespace BattleCity.Managers.Map
     {
         [SerializeField]
         private Transform _playerPlaceContainer;
-        [SerializeField]
-        private AudioSource _levelAudioSource;
 
         [SerializeField, Min(0), Space(15)]
         private float _rollSpeed;
@@ -43,21 +41,21 @@ namespace BattleCity.Managers.Map
             if (_player1 != null)
             {
                 _player1.OnDestroyed -= OnPlayerDestroyed;
-                _player1.Movement.InputEnabled = true;
+                _player1.SetMovementEnabled(true);
             }
             if (_player2 != null)
             {
                 _player2.OnDestroyed -= OnPlayerDestroyed;
-                _player2.Movement.InputEnabled = true;
+                _player2.SetMovementEnabled(true);
             }
             StopCoroutine(_rollCoroutine);
-            _levelAudioSource.Stop();
+            AudioSource.Stop();
         }
 
-        private void Start()
+        protected override void Start()
         {
-            _levelAudioSource.clip = SoundCollection.CurrentInstance.GetSound(SoundTypes.LevanPolka);
-            _levelAudioSource.Play();
+            AudioSource.clip = SoundCollection.CurrentInstance.GetSound(SoundTypes.LevanPolka);
+            AudioSource.Play();
             _rollCoroutine = StartCoroutine(RollCoroutine());
         }
 
@@ -127,7 +125,7 @@ namespace BattleCity.Managers.Map
 
                 entity.gameObject.transform.SetParent(PlayerSpawnPoints[0]);
                 _player1 = entity as PlayerStats;
-                _player1.Movement.InputEnabled = false;
+                _player1.SetMovementEnabled(false);
                 _player1.OnDestroyed += OnPlayerDestroyed;
             }
             else if (playerObjectName.Contains("Player2"))
@@ -137,7 +135,7 @@ namespace BattleCity.Managers.Map
 
                 entity.gameObject.transform.SetParent(PlayerSpawnPoints[1]);
                 _player2 = entity as PlayerStats;
-                _player2.Movement.InputEnabled = false;
+                _player2.SetMovementEnabled(false);
                 _player2.OnDestroyed += OnPlayerDestroyed;
             }
         }

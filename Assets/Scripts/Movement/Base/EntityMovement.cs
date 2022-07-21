@@ -103,8 +103,6 @@ namespace BattleCity.Movement.Base
 }
 
 // TODO:
-// game over
-// sounds
 // UI (lives, score, etc)
 // bonuses
 // improve handling

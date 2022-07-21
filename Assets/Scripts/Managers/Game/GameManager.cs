@@ -1,3 +1,4 @@
+using BattleCity.Assistance.Static;
 using BattleCity.Managers.Map;
 using BattleCity.Stats;
 using System;
@@ -16,6 +17,8 @@ namespace BattleCity.Managers.Game
         private int _startLevelIndex = 0;
         [SerializeField]
         private EntityFabric _entityFabric;
+        [SerializeField]
+        private SpriteRenderer _gameOverSprite;
 
         [SerializeField, Space(15)]
         private int _livesLeft_1Player = 2;
@@ -23,14 +26,16 @@ namespace BattleCity.Managers.Game
         private int _livesLeft_2Player = 2;
 
         private int _currentLevelIndex = -1;
+        private bool _gameOverLogicExecuted;
         private BaseMapManager _instatiatedLevel;
 
         private void Start()
         {
             _entityFabric.OnPreInitialize();
-            _entityFabric.OnPlayerDestroyed += OnPlayerDestroyed;
-            _entityFabric.OnEnemyDestroyed += OnEnemyDestoyed;
-            _entityFabric.OnEnemiesLeft += OnEnemiesLeft;
+            _entityFabric.PlayerDestroyed += OnPlayerDestroyed;
+            _entityFabric.EnemyDestroyed += OnEnemyDestoyed;
+            _entityFabric.EnemiesLeft += OnEnemiesLeft;
+            _entityFabric.BaseDestroyed += OnBaseDestroyed;
             if (_currentLevelIndex == -1)
             {
                 StartGameFromLevel(_levels[_startLevelIndex]);
@@ -39,9 +44,10 @@ namespace BattleCity.Managers.Game
 
         private void OnDisable()
         {
-            _entityFabric.OnPlayerDestroyed -= OnPlayerDestroyed;
-            _entityFabric.OnEnemyDestroyed -= OnEnemyDestoyed;
-            _entityFabric.OnEnemiesLeft -= OnEnemiesLeft;
+            _entityFabric.PlayerDestroyed -= OnPlayerDestroyed;
+            _entityFabric.EnemyDestroyed -= OnEnemyDestoyed;
+            _entityFabric.EnemiesLeft -= OnEnemiesLeft;
+            _entityFabric.BaseDestroyed -= OnBaseDestroyed;
         }
 
         private void OnEnemyDestoyed(EntityStats stats)
@@ -63,9 +69,13 @@ namespace BattleCity.Managers.Game
             _currentLevelIndex++;
             if (_currentLevelIndex >= _levels.Length)
             {
+#if DEBUG
                 Debug.Log("Todo: Game complete!");
                 Debug.Break();
                 return;
+#elif UNITY_STANDALONE
+                Application.Quit(0);
+#endif
             }
             _instatiatedLevel = Instantiate(_levels[_currentLevelIndex], _levelContainer);
             _instatiatedLevel.gameObject.SetActive(true);
@@ -90,9 +100,57 @@ namespace BattleCity.Managers.Game
                     _entityFabric.RespawnPlayer("Player2");
                 }
             }
+            if (CheckGameOver())
+            {
+                GameOverLogic();
+            }
+        }
+
+        private void OnBaseDestroyed(EntityStats stats)
+        {
+            _entityFabric.BaseDestroyed -= OnBaseDestroyed;
+            GameOverLogic();
         }
 
         private bool AreLivesLeft(int livesLeft) => livesLeft >= 0;
+
+        private bool CheckGameOver()
+        {
+            switch (GameStaticVariables.GameMode)
+            {
+                case SelectedGameMode.Mode_1Player:
+                    if (!AreLivesLeft(_livesLeft_1Player))
+                    {
+                        return true;
+                    }
+                    break;
+                case SelectedGameMode.Mode_2Player:
+                    if (!AreLivesLeft(_livesLeft_1Player) && !AreLivesLeft(_livesLeft_2Player))
+                    {
+                        return true;
+                    }
+                    break;
+            }
+            return false;
+        }
+
+        private void GameOverLogic()
+        {
+            if (_gameOverLogicExecuted)
+            {
+                return;
+            }
+            _gameOverSprite.enabled = true;
+
+#if DEBUG
+            Debug.Log("Game over!");
+            Debug.Break();
+            return;
+#elif UNITY_STANDALONE
+                Application.Quit(0);
+#endif
+
+        }
 
         private void OnEnemiesLeft()
         {

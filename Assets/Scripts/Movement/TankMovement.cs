@@ -7,6 +7,8 @@ namespace BattleCity.Movement
     {
         public bool InputEnabled { get; set; } = true;
 
+        public bool IsMoving { get; private set; }
+
         private void FixedUpdate()
         {
             UpdateDirection();
@@ -17,10 +19,12 @@ namespace BattleCity.Movement
         {
             if (InputEnabledMaster && InputEnabled && InputAxis != Vector2.zero)
             {
+                IsMoving = true;
                 _body.velocity = MovementConstraints.GetVectorMovement(MovementConstraints.GetDirectionFromRotation(_body.rotation)) * _speed;
             }
             else
             {
+                IsMoving = false;
                 _body.velocity = Vector2.zero;
             }
         }

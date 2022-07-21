@@ -9,6 +9,11 @@ namespace BattleCity.Stats
         [SerializeField]
         private Sprite _destoryedSprite;
 
+        public void SetHealth(int value)
+        {
+            Health = value;
+        }
+
         public override void SetDamage(int damage)
         {
             Health -= damage;

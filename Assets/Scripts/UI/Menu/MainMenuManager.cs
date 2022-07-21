@@ -13,6 +13,7 @@ namespace BattleCity.UI.Menu
         Start_1Player = 0,
         Start_2Player = 1,
         Start_Construction = 2,
+        Exit = 3,
     }
 
     public class MainMenuManager : MonoBehaviour
@@ -62,7 +63,8 @@ namespace BattleCity.UI.Menu
         private void Initialize()
         {
             _menuItems = FindObjectsOfType<ItemMarker>();
-            Array.Sort(_menuItems, new Comparison<ItemMarker>((item1, item2) => item1.SelectionIndex > item2.SelectionIndex ? 1 : 0));
+            Array.Sort(_menuItems, new Comparison<ItemMarker>((item1, item2) => item1.SelectionIndex.CompareTo(item2.SelectionIndex)));
+            
 
             for (int i = 0; i < _menuItems.Length; i++)
             {
@@ -113,6 +115,13 @@ namespace BattleCity.UI.Menu
                     case MenuActionTypes.Start_Construction:
 #if UNITY_EDITOR
                         Debug.Log($"TODO: level editor");
+#endif
+                        break;
+                    case MenuActionTypes.Exit:
+#if UNITY_EDITOR
+                        Debug.Break();
+#elif UNITY_STANDALONE
+                        Application.Quit(0);
 #endif
                         break;
                 }

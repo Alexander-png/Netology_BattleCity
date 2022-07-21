@@ -38,6 +38,7 @@ namespace BattleCity.Managers.Game
         private PlayerStats _currentPlayer1Object;
         private PlayerStats _currentPlayer2Object;
         private List<BaseStats> _currentBaseObjects;
+        private int _baseHealth;
 
         private byte _enemiesLeft;
         private byte _maxAliveEnemies;
@@ -45,10 +46,10 @@ namespace BattleCity.Managers.Game
         private int _spawnedEnemyCount;
         private int[] _enemiesWithBonus;
 
-        public event EnemySpawnEvents OnEnemiesLeft;
-        public event EntityEvents OnPlayerDestroyed;
-        public event EntityEvents OnEnemyDestroyed;
-        public event EntityEvents OnBaseDestroyed;
+        public event EnemySpawnEvents EnemiesLeft;
+        public event EntityEvents PlayerDestroyed;
+        public event EntityEvents EnemyDestroyed;
+        public event EntityEvents BaseDestroyed;
         public event EntityPreSpawnEvents PlayerPreSpawn;
 
         private void OnDisable()
@@ -61,10 +62,10 @@ namespace BattleCity.Managers.Game
             }
             _currentBaseObjects.Clear();
 
-            OnEnemiesLeft = null;
-            OnPlayerDestroyed = null;
-            OnEnemyDestroyed = null;
-            OnBaseDestroyed = null;
+            EnemiesLeft = null;
+            PlayerDestroyed = null;
+            EnemyDestroyed = null;
+            BaseDestroyed = null;
             PlayerPreSpawn = null;
         }
 
@@ -105,6 +106,7 @@ namespace BattleCity.Managers.Game
             _enemySpawnPoints = map.EnemySpawnPoints;
             _playerSpawnPoints = map.PlayerSpawnPoints;
             _enemiesLeft = map.EnemiesOnLevel;
+            _baseHealth = map.BaseHealth;
 
             switch (_currentGameMode)
             {
@@ -199,6 +201,7 @@ namespace BattleCity.Managers.Game
             else if (entity is BaseStats newBase)
             {
                 newBase.OnDestroyed += OnBaseDestroyedInternal;
+                newBase.SetHealth(_baseHealth);
                 _currentBaseObjects.Add(newBase);
             }
         }
@@ -221,7 +224,7 @@ namespace BattleCity.Managers.Game
                 yield return new WaitForSeconds(_enemySpawnDelay);
             }
             ResetVariables();
-            OnEnemiesLeft?.Invoke();
+            EnemiesLeft?.Invoke();
         }
 
         private void ResetVariables()
@@ -233,20 +236,20 @@ namespace BattleCity.Managers.Game
         {
             sender.OnDestroyed -= OnEnemyDestroy;
             _currentAliveEnemies--;
-            OnEnemyDestroyed?.Invoke(sender);
+            EnemyDestroyed?.Invoke(sender);
         }
 
         private void OnPlayerDestroyedInternal(EntityStats sender)
         {
             sender.OnDestroyed -= OnPlayerDestroyedInternal;
-            OnPlayerDestroyed?.Invoke(sender);
+            PlayerDestroyed?.Invoke(sender);
         }
 
         private void OnBaseDestroyedInternal(EntityStats sender)
         {
             sender.OnDestroyed -= OnBaseDestroyedInternal;
             _currentBaseObjects.Remove(sender as BaseStats);
-            OnBaseDestroyed?.Invoke(sender);
+            BaseDestroyed?.Invoke(sender);
         }
 
         public delegate void EnemySpawnEvents();

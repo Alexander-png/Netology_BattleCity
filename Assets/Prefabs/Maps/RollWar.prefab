@@ -489,6 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60a9269a99d06b7499725ff4e87059a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _audioSource: {fileID: 7831738418627624711}
   _maxEnemiesOnMapOnePlayer: 4
   _maxEnemiesOnMapTwoPlayer: 6
   _enemiesOnLevel: 20
@@ -502,8 +503,8 @@ MonoBehaviour:
   - {fileID: 8516167389067864853}
   _basePlaces:
   - {fileID: 335214352973079909}
+  _baseHealth: 5
   _playerPlaceContainer: {fileID: 6172642436620056677}
-  _levelAudioSource: {fileID: 7831738418627624711}
   _rollSpeed: 100
   _maxContinuousRollTime: 5
   _minContinuousRollTime: 1

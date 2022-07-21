@@ -10,6 +10,8 @@ namespace BattleCity.Stats
     public class PlayerStats : EntityStats
     {
         [SerializeField]
+        private AudioSource _audioSource;
+        [SerializeField]
         private SpriteRenderer _sprite;
         [SerializeField]
         private TankMovement _movement;
@@ -18,8 +20,11 @@ namespace BattleCity.Stats
         [SerializeField, Range(0f, 5f), Space(15)]
         private float _protectionTime = 3;
 
+        private bool _lastMoveState = false;
         private bool _underProtection;
         private LiteAnimation _shieldAnimation;
+        private AudioClip _moveClip;
+        private AudioClip _idleClip;
 
         public TankMovement Movement => _movement;
 
@@ -34,6 +39,46 @@ namespace BattleCity.Stats
                 _shieldAnimation = Instantiate(shieldAnimation, transform);
                 _shieldAnimation.SetVisible(false);
             }
+            //_moveClip = SoundCollection.GetSound(SoundTypes.PlayerMove);
+            //_idleClip = SoundCollection.GetSound(SoundTypes.PlayerIdle);
+            //_audioSource.clip = _idleClip;
+            //_audioSource.Play();
+        }
+
+        public void SetMovementEnabled(bool value)
+        {
+            _movement.InputEnabled = value;
+            if (!value)
+            {
+                _audioSource.Stop();
+            }
+            else
+            {
+                _audioSource.Play();
+            }
+        }
+
+        private void FixedUpdate()
+        {
+            //DetermineMoveSound();
+        }
+
+        private void DetermineMoveSound()
+        {
+            if (_lastMoveState != _movement.IsMoving)
+            {
+                if (_movement.IsMoving)
+                {
+                    _audioSource.clip = _moveClip;
+                    _audioSource.Play();
+                }
+                else
+                {
+                    _audioSource.clip = _idleClip;
+                    _audioSource.Play();
+                }
+            }
+            _lastMoveState = _movement.IsMoving;
         }
 
         public void SetKnockDown(float time)
